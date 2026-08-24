@@ -69,6 +69,17 @@ what makes the deterministic-core-first sequencing possible.
 **Phase gate:** do not start phase 1 until 0.4 is done. The deploy path being real is
 the assumption everything else rests on.
 
+**Phase 0 complete, 2026-08-24.** `hello.py` deployed to **Studionet** (hosted dev
+network — not the phase-5 target) at `0x58D922077f349651a784114F03F11c5Ef71f0C54`,
+tx `0x9f456f983ca5e33a4a084e469f5014e3d6578f2a42277dec0fa0385b13978485`,
+`status_name: ACCEPTED`, `result_name: MAJORITY_AGREE` (3 agree / 2 idle-after-quorum
+of 5 validators). `get_greeting()` view call returned the deployed value correctly.
+Deployed by a fresh `veritas-deployer` account created for this project, kept
+separate from other local GenLayer accounts. **This proves the pipeline, not the
+submission evidence** — phase 5 still needs a real deploy to Testnet Asimov or
+Bradbury for the Points evidence URL, since Studionet is the hosted dev environment,
+not a public testnet with independent validators.
+
 > **Runner pin rule, restated because it breaks deploys:** every contract file's first
 > line is a pinned `Depends` hash. `py-genlayer:test`, `py-genlayer:latest`, and bare
 > `py-genlayer` are rejected by all GenLayer networks. Task 0.3 exists so this is
