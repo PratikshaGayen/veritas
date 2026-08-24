@@ -1,0 +1,7 @@
+{
+  "url": "https://httpbin.org/status/429",
+  "status_code": 429,
+  "body": "",
+  "captured_at": "2026-08-24T13:28:33.329855+00:00",
+  "provenance": "live"
+}

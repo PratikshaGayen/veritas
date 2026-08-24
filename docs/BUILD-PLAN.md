@@ -232,6 +232,40 @@ This test *is* the value proposition. It belongs first in the README's test sect
 
 ---
 
+**Phase 2 complete, 2026-08-24.** `lib/normalize/_html.py` (shared tag-stripper),
+`availability.py` (task 2.3), and `normalize.py` (task 2.4) implemented per spec.
+206 unit tests pass in 0.39s total (up from 168 after phase 1).
+
+Fixture corpus (`tests/fixtures/`, 2.5MB, 10 files) mixes real live captures with a
+few synthetic ones, each tagged `"provenance": "live"` or `"synthetic"` in the
+fixture JSON — see `scripts/build_fixtures.py`. Live: `rate_limited_429` and
+`server_error_503` (httpbin.org, real 429/503), `status_page_ok` and
+`github_pr_ok` (each captured **twice**, independently, for the stability test —
+their raw bytes genuinely differ), `irrelevant_page` (a real Wikipedia article,
+paired with an unrelated question for the `NO_OVERLAP` case). Synthetic, because
+triggering them reliably against a live target isn't reproducible for CI:
+`bot_interstitial`, `paywalled_article`, `empty_spa_shell` — each exercises one
+specific detector rule deterministically, documented as hand-crafted rather than
+presented as scraped.
+
+**The headline test passes on real data, not a contrived example:**
+`test_normalization_is_stable_across_refetches` — the same live URL, fetched twice,
+independently, minutes apart within this session — produces byte-different raw HTML
+(confirmed: same length, different content, almost certainly an embedded
+nonce/session token) but **identical** normalized output.
+
+Two real bugs found and fixed while writing this phase's tests (not GenLayer
+tooling — bugs in code written this session):
+1. `_quantize_numbers` was eating the year out of `YYYY-MM-DD` dates (`2026` became
+   `2000`) because it ran before date-awareness existed — fixed with a negative
+   lookahead protecting `\d{4}-\d{2}-\d{2}` patterns.
+2. `@pytest.mark.parametrize` with a 100KB/1MB string literal crashed the *entire*
+   test file on Windows (`PYTEST_CURRENT_TEST` env var exceeds the 32767-char
+   Windows limit, corrupting pytest's teardown state for unrelated tests) — moved
+   large-input cases into their own non-parametrized test functions. Logged as a
+   general (non-GenLayer) skill observation, since it's a Windows-vs-POSIX pytest
+   gotcha worth remembering beyond this project.
+
 ## Phase 3 — Core contract
 
 ### 3.1 Storage and constructor

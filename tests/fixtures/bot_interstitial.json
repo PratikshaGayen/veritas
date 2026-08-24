@@ -1,0 +1,7 @@
+{
+  "url": "https://example.test/protected",
+  "status_code": 200,
+  "body": "<!DOCTYPE html>\n<html>\n<head><title>Just a moment...</title></head>\n<body>\n<div id=\"challenge-running\">\n  <h1>Checking your browser before accessing example.com.</h1>\n  <p>This process is automatic. Your browser will redirect to your requested content shortly.</p>\n  <p>Please allow up to 5 seconds...</p>\n  <div id=\"cf-please-wait\">Please enable Cookies and reload the page.</div>\n  <noscript><h2>Enable JavaScript and cookies to continue</h2></noscript>\n</div>\n</body>\n</html>\n",
+  "captured_at": "2026-08-24T13:29:28.679301+00:00",
+  "provenance": "synthetic"
+}

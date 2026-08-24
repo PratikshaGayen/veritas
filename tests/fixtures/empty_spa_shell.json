@@ -1,0 +1,7 @@
+{
+  "url": "https://example.test/dashboard",
+  "status_code": 200,
+  "body": "<!DOCTYPE html>\n<html>\n<head><title>Dashboard</title></head>\n<body>\n<div id=\"root\"></div>\n<script src=\"/static/js/bundle.a1b2c3.js\"></script>\n</body>\n</html>\n",
+  "captured_at": "2026-08-24T13:29:29.062874+00:00",
+  "provenance": "synthetic"
+}

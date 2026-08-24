@@ -1,0 +1,7 @@
+{
+  "url": "https://httpbin.org/status/503",
+  "status_code": 503,
+  "body": "",
+  "captured_at": "2026-08-24T13:28:33.494593+00:00",
+  "provenance": "live"
+}

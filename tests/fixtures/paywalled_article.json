@@ -1,0 +1,7 @@
+{
+  "url": "https://example.test/markets-article",
+  "status_code": 200,
+  "body": "<!DOCTYPE html>\n<html>\n<head><title>Markets rattled as central bank signals rate pause</title></head>\n<body>\n<article>\n<h1>Markets rattled as central bank signals rate pause</h1>\n<p>Global markets reacted sharply on Monday after the central bank hinted at a\npause in its rate-hiking cycle, sending bond yields lower and equities higher\nin early trading across major exchanges.</p>\n<div class=\"paywall\">\n  <p>To continue reading this article, subscribe now to read the rest of our\n  in-depth market coverage.</p>\n  <button>Subscribe to continue</button>\n</div>\n</article>\n</body>\n</html>\n",
+  "captured_at": "2026-08-24T13:29:28.874361+00:00",
+  "provenance": "synthetic"
+}
