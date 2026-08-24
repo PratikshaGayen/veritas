@@ -1,0 +1,19 @@
+paths:
+  contracts: contracts/
+
+networks:
+  default: studionet
+  # Pre-configured with 10 auto-generated funded-for-gasless accounts by
+  # gltest itself — no accounts: key needed. Real consensus (leader +
+  # validators), real web/LLM calls, no funding required. See
+  # docs/BUILD-PLAN.md phase 5 and the genlayer-dev:integration-tests
+  # skill. Rate-limited: 60 req/min, 1000 req/hr, 10000 req/day per IP —
+  # keep tests few and deliberate.
+  studionet: {}
+
+  testnet_bradbury:
+    # The real public testnet — the phase-5 submission-evidence target.
+    # Requires a funded account; see docs/RUNNER.md and the
+    # veritas-deployer account. Not yet funded as of this commit.
+    accounts:
+      - "${VERITAS_DEPLOYER_PRIVATE_KEY}"

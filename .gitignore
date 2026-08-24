@@ -7,6 +7,8 @@ venv/
 .genlayer/
 node_modules/
 .pytest_cache/
+.gltest_cache/
+artifacts/
 .DS_Store
 dist/
 build/

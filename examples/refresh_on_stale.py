@@ -1,15 +1,15 @@
 # { "Depends": "py-genlayer:1jb45aa8ynh2a9c9xn3b7qqh8sm5q93hwfp7jqmwsfhh8jpz09h6" }
-"""examples/refresh_on_stale.py — pay to keep your own fact fresh.
+"""examples/refresh_on_stale.py - pay to keep your own fact fresh.
 
 Unlike request_fact (idempotent no-op if already fresh or already in
-flight), refresh() unconditionally re-resolves — the right call when you
+flight), refresh() unconditionally re-resolves - the right call when you
 specifically want the newest possible answer and are willing to pay for
 it. See docs/ARCHITECTURE.md section 8: "refresh is caller-driven" is a
-deliberate design choice, not a missing feature — cost falls on whoever
+deliberate design choice, not a missing feature - cost falls on whoever
 needs freshness.
 
 The VeritasIface block below is copy-pasted verbatim from
-contracts/veritas/interface.py — that file is the canonical source.
+contracts/veritas/interface.py - that file is the canonical source.
 """
 
 from genlayer import *

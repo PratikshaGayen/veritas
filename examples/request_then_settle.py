@@ -1,5 +1,5 @@
 # { "Depends": "py-genlayer:1jb45aa8ynh2a9c9xn3b7qqh8sm5q93hwfp7jqmwsfhh8jpz09h6" }
-"""examples/request_then_settle.py — the canonical Veritas caller pattern.
+"""examples/request_then_settle.py - the canonical Veritas caller pattern.
 
 Demonstrates all three branches a real caller needs (docs/ARCHITECTURE.md
 section 7): request when there's nothing cached yet, wait when a
@@ -7,7 +7,7 @@ resolution is already in flight or stale, and refuse to guess when the
 fact resolved to anything other than OK.
 
 The VeritasIface block below is copy-pasted verbatim from
-contracts/veritas/interface.py — that file is the canonical source.
+contracts/veritas/interface.py - that file is the canonical source.
 """
 
 from genlayer import *
@@ -46,14 +46,14 @@ class RequestThenSettle(gl.Contract):
         fact = iface.view().get_fact(key, u256(3600))
 
         if fact["status"] == "PENDING" or not fact["is_fresh"]:
-            # request_fact is idempotent — safe to call even if a
+            # request_fact is idempotent - safe to call even if a
             # resolution is already in flight. Come back and call
             # settle() again once it resolves.
             iface.emit(on="finalized").request_fact(self.url, self.question, self.schema)
             return
 
         if fact["status"] != "OK":
-            # UNAVAILABLE or SCHEMA_VIOLATION — wait, don't guess.
+            # UNAVAILABLE or SCHEMA_VIOLATION - wait, don't guess.
             return
 
         self.settled = True

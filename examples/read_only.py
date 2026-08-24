@@ -1,13 +1,13 @@
 # { "Depends": "py-genlayer:1jb45aa8ynh2a9c9xn3b7qqh8sm5q93hwfp7jqmwsfhh8jpz09h6" }
-"""examples/read_only.py — the simplest Veritas integration.
+"""examples/read_only.py - the simplest Veritas integration.
 
 Reads a cached fact and settles based on it. Never calls request_fact
-itself — this pattern assumes some other caller (or a one-off CLI call)
+itself - this pattern assumes some other caller (or a one-off CLI call)
 has already requested the fact. Good for a contract that only cares about
 a fact someone else is already keeping fresh.
 
 The VeritasIface block below is copy-pasted verbatim from
-contracts/veritas/interface.py — that file is the canonical source.
+contracts/veritas/interface.py - that file is the canonical source.
 """
 
 from genlayer import *

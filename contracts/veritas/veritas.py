@@ -1,23 +1,23 @@
 # { "Depends": "py-genlayer:1jb45aa8ynh2a9c9xn3b7qqh8sm5q93hwfp7jqmwsfhh8jpz09h6" }
-"""Veritas — a shared, schema-constrained web-fact oracle.
+"""Veritas - a shared, schema-constrained web-fact oracle.
 
 Self-contained by design: `genlayer deploy --contract <path>` ships exactly
 the bytes of this one file (confirmed against the CLI's deployment
-mechanics — there is no multi-file import path for a single `py-genlayer`
+mechanics - there is no multi-file import path for a single `py-genlayer`
 deployment). The schema/normalize logic below is a lock-step copy of
 lib/schema/*.py and lib/normalize/*.py, verified identical by
 tests/direct/test_veritas_parity.py. See docs/ARCHITECTURE.md and
 docs/BUILD-PLAN.md phase 3 for the full design rationale.
 
 Error taxonomy note (a refinement made concrete while writing this file):
-HTTP/fetch failures do NOT raise — they become the UNAVAILABLE status VALUE,
+HTTP/fetch failures do NOT raise - they become the UNAVAILABLE status VALUE,
 because that is the entire point of Veritas (docs/ARCHITECTURE.md section
 1). [EXPECTED] fires for a malformed schema declaration, deterministically,
 *before* the non-deterministic block even starts, so it never needs
 leader/validator comparison at all. [LLM_ERROR] fires inside the leader
 function when the model returns non-dict JSON, and always forces validator
 disagreement (rotation) per docs/ARCHITECTURE.md section 5. [EXTERNAL] and
-[TRANSIENT] are therefore unused in v1 — reserved for a future failure
+[TRANSIENT] are therefore unused in v1 - reserved for a future failure
 class that must raise rather than resolve to UNAVAILABLE.
 """
 
@@ -114,7 +114,7 @@ _DEFAULT_PORTS = {"http": 80, "https": 443}
 
 
 # ---------------------------------------------------------------------------
-# Schema kernel — lock-step copy of lib/schema/parse.py + project.py
+# Schema kernel - lock-step copy of lib/schema/parse.py + project.py
 # ---------------------------------------------------------------------------
 
 
@@ -292,7 +292,7 @@ def _project(schema: _Schema, raw: str):
 
 
 # ---------------------------------------------------------------------------
-# Normalize kernel — lock-step copy of lib/normalize/*.py
+# Normalize kernel - lock-step copy of lib/normalize/*.py
 # ---------------------------------------------------------------------------
 
 
@@ -410,7 +410,7 @@ def _normalize(body: str, question: str) -> str:
 
 
 # ---------------------------------------------------------------------------
-# Key derivation — lock-step copy of lib/schema/keys.py
+# Key derivation - lock-step copy of lib/schema/keys.py
 # ---------------------------------------------------------------------------
 
 
@@ -452,7 +452,7 @@ def _compute_key(url: str, question: str, schema_decl: str) -> str:
 def _compute_key_or_raise(url: str, question: str, schema_decl: str) -> str:
     """compute_key() wrapped with the [EXPECTED] error prefix. request_fact
     and the compute_key view both need a malformed schema to fail with the
-    prefix intact — _compute_key itself stays a plain ValueError-raiser so
+    prefix intact - _compute_key itself stays a plain ValueError-raiser so
     it matches lib/schema/keys.veritas_key()'s off-chain behavior exactly
     for the parity test.
     """
@@ -611,7 +611,7 @@ class Veritas(gl.Contract):
         def validator_fn(leaders_res: gl.vm.Result) -> bool:
             if not isinstance(leaders_res, gl.vm.Return):
                 # The only error leader_fn can raise is [LLM_ERROR]
-                # (malformed model JSON) — always disagree, forcing
+                # (malformed model JSON) - always disagree, forcing
                 # validator rotation, per docs/ARCHITECTURE.md section 5.
                 return False
             mine = leader_fn()
@@ -643,12 +643,12 @@ class Veritas(gl.Contract):
 
 def _resolve_pipeline(url: str, question: str, schema: _Schema) -> dict:
     """The full leader-side resolution pipeline. Re-run independently by the
-    validator inside validator_fn — see docs/ARCHITECTURE.md section 4.
+    validator inside validator_fn - see docs/ARCHITECTURE.md section 4.
     Every branch returns a value; only malformed LLM JSON raises.
     """
     try:
         resp = gl.nondet.web.request(url, method="GET")
-        # NOTE: the field is `.status`, NOT `.status_code` — verified against
+        # NOTE: the field is `.status`, NOT `.status_code` - verified against
         # the actual installed SDK's genlayer/gl/nondet/web.py Response
         # dataclass, which disagrees with the public docs' HTTP-errors
         # example. See docs/FRICTION.md.

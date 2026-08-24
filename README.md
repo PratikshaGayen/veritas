@@ -190,8 +190,8 @@ entire value proposition.
 
 | | |
 |---|---|
-| Testnet address | `[TBD — phase 5]` |
-| Consensus stability, volatile page | `[TBD — measured in phase 5, published as-is]` |
+| Testnet address | `[TBD — pending veritas-deployer funding]` |
+| Consensus stability, volatile page | **100% (10/10)** — real leader + validators, live GitHub status page, [docs/STABILITY-REPORT.md](docs/STABILITY-REPORT.md) |
 | Contracts retrofitted | `[TBD — phase 6]` |
 | Lines removed by retrofit | `[TBD — phase 6]` |
 

@@ -495,6 +495,52 @@ reliability, and it is evidence a reviewer can actually check.
 
 ---
 
+**Phase 5 in progress, 2026-08-24.** Tasks 5.1-5.4 complete: 4 real consensus
+integration tests pass against `studio.genlayer.com` (real leader + validators,
+real web fetches, real LLM calls, gasless) — `test_stable_page_reaches_consensus`,
+`test_volatile_page_reaches_consensus` (the real proof — GitHub's live status page,
+independently fetched by leader and every validator), `test_rate_limited_page_becomes_unavailable`
+(a real 429 from httpbin.org resolves to `UNAVAILABLE`, not a guess), and
+`test_duplicate_request_fact_is_idempotent`. All 4 pass in ~141s total.
+
+**One more real, significant bug found and fixed:** `gltest` (the standard
+integration-test tool) crashed on `factory.deploy()` with an opaque
+`ValueError: Failed to get schema from all clients`, even though the contract had
+genuinely deployed (confirmed independently via `genlayer schema <address>`). Root
+cause, found by bypassing `gltest`'s exception-swallowing fallback and calling the
+underlying client directly: `genlayer_py`'s `get_contract_schema_for_code` calls
+`eth_utils.encode_hex()` on the contract source, which does `.encode("ascii")` —
+**any non-ASCII character anywhere in the contract file** breaks it. The culprit was
+em-dashes (`—`) used liberally in docstrings across `veritas.py`, `interface.py`, and
+all three examples. Fixed by replacing every em-dash with a plain hyphen in every
+deployable file; `lib/` and `docs/` are unaffected since they're never
+schema-fetched this way. Logged to [FRICTION.md](./FRICTION.md).
+
+**Task 5.7 complete.** `tests/integration/test_stability.py` (driven by
+`scripts/stability_run.py`) resolved the same live volatile page (GitHub's real
+status page) 10 times in a row via `refresh()`, each a fully independent real
+consensus round. **Result: 10/10 (100%) — [docs/STABILITY-REPORT.md](./STABILITY-REPORT.md).**
+Ten rounds over ~5 minutes is a smaller sample than the ambitious 20+ suggested in
+the roadmap, chosen deliberately given `studio.genlayer.com`'s per-IP rate limits and
+real per-round LLM cost — the number is real and reproducible
+(`python scripts/stability_run.py --runs N`) rather than padded for its own sake. If
+a larger sample is wanted later, re-running is one command away, and the report is
+overwritten with fresh honest data, not merged.
+
+`get_contract_factory()` needed pytest-plugin-injected config state that doesn't
+exist outside a `gltest` run — a bare `python scripts/stability_run.py` invocation
+failed immediately (`AttributeError: 'NoneType' object has no attribute 'exists'`).
+Restructured as a real pytest test (`tests/integration/test_stability.py`, marked
+`@pytest.mark.slow`) with `scripts/stability_run.py` reduced to a thin subprocess
+wrapper around `gltest ... -m slow`.
+
+**Tasks 5.5/5.6 (testnet deploy + example cross-contract read) remain blocked** on
+funding the `veritas-deployer` account (`0x64d086cf602b99c5293e30ba5dd171261afcc766`)
+— the Bradbury/Asimov faucet requires the claiming wallet to already hold 0.01 ETH on
+Ethereum mainnet, which a freshly-generated dev account does not have. User is
+funding directly; deploy commands are ready to run the moment it lands. Balance
+checked as of this commit: still 0 GEN on Testnet Bradbury.
+
 ## Phase 6 — Adapter rewrites
 
 | # | Task | Done when |

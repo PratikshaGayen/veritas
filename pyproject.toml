@@ -1,3 +1,6 @@
 [tool.pytest.ini_options]
 pythonpath = ["."]
 testpaths = ["tests/unit", "tests/direct"]
+markers = [
+    "slow: expensive real-network integration test, excluded from default runs (gltest -m slow to include)",
+]
