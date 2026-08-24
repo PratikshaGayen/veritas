@@ -153,6 +153,16 @@ golden-vector test file pins ten known key values that must never change.
 
 ---
 
+**Phase 1 complete, 2026-08-24.** `lib/schema/parse.py`, `project.py`, `keys.py`
+implemented exactly per the spec above. 168 unit tests pass in 0.26s covering every
+schema kind's success/violation paths, a never-raises garbage sweep for `project()`,
+and golden-vector + property tests for `veritas_key()` (case/port/slash/fragment
+stability, query-string and path-case sensitivity by design, schema-declaration
+equivalence). The task 1.1 canonicalization assertion
+(`canonical(parse("ENUM: Up , down,DEGRADED "))` equals
+`canonical(parse("ENUM:degraded,down,up"))`) verified directly, not just via the
+test suite.
+
 ## Phase 2 — Normalizer and availability gate
 
 ### 2.1 `scripts/capture_fixture.py`
