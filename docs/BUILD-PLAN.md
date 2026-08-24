@@ -365,6 +365,61 @@ Tag the commit. From here, fields append at the end only.
 
 ---
 
+**Phase 3 complete, 2026-08-24.** `contracts/veritas/veritas.py` implemented as a
+**self-contained file** — confirmed via `genlayer deploy --help` and the deploy-scripts
+docs that `genlayer deploy --contract <path>` ships exactly the bytes of one file, with
+no multi-file import path for a single `py-genlayer` deployment. The schema/normalize
+logic is therefore a hand-kept lock-step copy of `lib/schema/*.py` and
+`lib/normalize/*.py`, not an import — verified identical by
+`tests/direct/test_veritas_parity.py`'s key-derivation parity test (satisfies part of
+task 4.2 early).
+
+Lints and validates cleanly: `genvm-lint check` reports 6 methods (4 view, 2 write),
+matching the design exactly. 19 direct-mode tests pass (11 for Veritas beyond the 2
+phase-0 hello-world tests, plus the parity test), covering storage/views, all three
+TTL boundaries via `direct_vm.warp`, idempotency (3x `request_fact` calls -> 1
+resolution), `refresh`'s bypass semantics, the `[EXPECTED]` and `[LLM_ERROR]` error
+paths, and every leader-side status (`OK`/`UNAVAILABLE`/`SCHEMA_VIOLATION`).
+
+**Confirmed constraint, not assumed:** direct mode runs the leader function only —
+`validator_fn` is never invoked by `direct_deploy`'s call path. Whether the validator
+actually agrees or disagrees on a given leader result is unprovable in direct mode;
+that is exclusively a phase-5 integration-test concern. The task 3.4 "Done when"
+language above (stubbing a leader result and asserting the validator's decision) does
+not hold under `genlayer-test` as installed — noted here rather than silently
+reinterpreted.
+
+**Error taxonomy refinement, made concrete while writing this file:** HTTP/fetch
+failures do NOT raise — they resolve to the `UNAVAILABLE` status **value**, which is
+the entire point of Veritas. `[EXPECTED]` fires only for a malformed schema
+declaration, deterministically, before the non-deterministic block starts at all (so
+it needs no leader/validator comparison). `[LLM_ERROR]` fires inside the leader
+function when the model returns non-dict JSON, and always forces disagreement.
+`[EXTERNAL]`/`[TRANSIENT]` are consequently unused in v1 — documented in the
+contract's own docstring rather than left as silent dead code.
+
+**Four real bugs found and fixed while building and testing this phase** — three in
+GenLayer tooling/docs (added to [FRICTION.md](./FRICTION.md)), one in this project's
+own code:
+1. `genlayer-test`'s direct-mode SDK downloader hardcodes a GitHub release asset name
+   (`genvm-universal.tar.xz`) that doesn't exist in the actual release — 404s on first
+   use on a clean machine. Worked around by reusing `genvm-linter`'s cache (see
+   [RUNNER.md](./RUNNER.md) "Direct-mode test setup").
+2. The docs' web-access "Handling HTTP Errors" example uses `response.status_code`;
+   the actual installed SDK's `Response` dataclass (read directly from
+   `genlayer/gl/nondet/web.py`) has the field `.status`. Using the documented name
+   fails silently inside a broad `except Exception`, producing a plausible-looking but
+   wrong `UNAVAILABLE`/`FETCH_ERROR` result instead of an obvious crash.
+3. This project's own bug: `request_fact` called the unwrapped `_compute_key` (which
+   raises a bare `ValueError`) before ever reaching `_resolve`'s `[EXPECTED]`-wrapping
+   try/except, so a malformed schema string leaked an unprefixed error. Fixed by
+   routing both `request_fact` and the `compute_key` view through a shared
+   `_compute_key_or_raise` wrapper.
+4. This project's own test-design bug: `has_fresh(key, max_age=0)` immediately after
+   a resolve is `True`, not `False` — `now - fetched_at == 0 <= 0`. Staleness only
+   appears once time actually advances; fixed the test to `direct_vm.warp()` forward
+   first.
+
 ## Phase 4 — Dependency surface
 
 | # | Task | Done when |

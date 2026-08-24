@@ -21,6 +21,8 @@ test: test-unit test-direct
 test-unit:
 	pytest tests/unit -v
 
+# On Windows, run this under WSL, not a native shell — see docs/RUNNER.md
+# "Direct-mode test setup" for the one-time cache workaround it needs.
 test-direct:
 	pytest tests/direct -v
 

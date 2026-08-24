@@ -67,6 +67,26 @@ The `Makefile`'s `lint` target sets this automatically.
 Any hash used in this repo must appear under the `py-genlayer` (or relevant) key in
 that manifest for the currently cached version.
 
+## Direct-mode test setup (one-time, per machine)
+
+`genlayer-test`'s direct-mode SDK downloader is currently broken (see
+[FRICTION.md](./FRICTION.md)) — it 404s on first use because it requests a GitHub
+release asset (`genvm-universal.tar.xz`) that doesn't exist under that name.
+Work around it by reusing `genvm-linter`'s cache, which (confusingly) names its own
+bundle the same way despite fetching it successfully via a different path:
+
+```bash
+# Native Windows / macOS / Linux — genvm-linter's cache location varies by OS;
+# on Windows it's %USERPROFILE%\.cache\genvm-linter\
+mkdir -p ~/.cache/gltest-direct
+cp ~/.cache/genvm-linter/genvm-universal-<version>.tar.xz ~/.cache/gltest-direct/
+```
+
+Also required on Windows: direct-mode tests crash with `PermissionError:
+[WinError 32]` on native Windows Python (a separate confirmed bug, also in
+FRICTION.md) — run `pytest tests/direct` under **WSL**, not a native Windows shell.
+`tests/unit` is pure Python and unaffected either way.
+
 ## Pre-push checklist
 
 - [ ] Every `.py` file under `contracts/` has the pinned hash above as its first line
