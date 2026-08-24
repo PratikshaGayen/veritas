@@ -26,9 +26,13 @@ jobs:
 
       - name: Lint contracts
         run: |
-          for f in $(find contracts -name '*.py'); do
+          for f in $(find contracts -name '*.py' -not -name 'interface.py'); do
             echo "== $f =="
             genvm-lint check "$f"
+          done
+          for f in $(find contracts -name 'interface.py'); do
+            echo "== $f (AST-only, not deployable) =="
+            genvm-lint lint "$f"
           done
 
       - name: Unit tests (pure Python, no GenLayer)

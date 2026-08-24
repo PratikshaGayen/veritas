@@ -66,18 +66,16 @@ The tolerance becomes auditable on-chain, and the validator stays un-gameable.
 ## The shape
 
 ```python
-# The key is content-addressed, so you compute it yourself - no return value needed.
-KEY = veritas_key(
-    url="https://flightaware.com/live/flight/AI302",
-    question="Is this flight delayed more than 3 hours?",
-    schema="BOOL",
-)
+# contracts/veritas/interface.py has the full VeritasIface block — copy it
+# verbatim into your own contract file (GenVM deploys one file at a time,
+# so there is no cross-file import; see "Why the API looks like this" below).
 
-v = gl.get_contract_at(VERITAS_ADDR)
-fact = v.view().get_fact(KEY, u256(3600))     # any contract, later, for free
+iface = VeritasIface(VERITAS_ADDR)
+key = iface.view().compute_key(URL, QUESTION, "BOOL")   # content-addressed
+fact = iface.view().get_fact(key, u256(3600))            # any contract, for free
 
 if fact["status"] == "PENDING" or not fact["is_fresh"]:
-    v.emit(on="finalized").request_fact(URL, QUESTION, "BOOL")
+    iface.emit(on="finalized").request_fact(URL, QUESTION, "BOOL")
     return                                     # come back after resolution
 
 if fact["status"] != "OK":
@@ -85,6 +83,11 @@ if fact["status"] != "OK":
 
 self._settle(fact["answer"] == "true")
 ```
+
+Full worked examples: [read_only.py](examples/read_only.py),
+[request_then_settle.py](examples/request_then_settle.py) (the pattern above),
+[refresh_on_stale.py](examples/refresh_on_stale.py) — all three lint and deploy
+independently.
 
 **Cached with a TTL and a content fingerprint.** The first contract to ask a question
 pays for it; the whole ecosystem reads it free. That is the compounding part.
@@ -143,6 +146,8 @@ callers with different freshness needs still share one cache slot.
 | [ROADMAP.md](docs/ROADMAP.md) | Eight phases, exit criteria, scope boundaries, risk register |
 | [BUILD-PLAN.md](docs/BUILD-PLAN.md) | File-level tasks with Done-when assertions, testing strategy |
 | [SUBMISSION-STRATEGY.md](docs/SUBMISSION-STRATEGY.md) | How this maps to GenLayer Points contribution categories |
+| [RUNNER.md](docs/RUNNER.md) | Pinned runner hash, direct-mode test setup (the WSL cache workaround) |
+| [FRICTION.md](docs/FRICTION.md) | Real GenLayer tooling/docs bugs found while building this, with repros |
 
 ---
 

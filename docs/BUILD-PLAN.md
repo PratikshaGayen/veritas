@@ -436,6 +436,47 @@ README and `interface.py`. If you have to open `veritas.py`, the interface is no
 
 ---
 
+**Phase 4 complete, 2026-08-24.** `contracts/veritas/interface.py` written per task
+4.1 — lints cleanly with `genvm-lint lint` (AST-only). It correctly **fails**
+`genvm-lint check`'s deployability validation ("No contract class found"), because
+it has no `gl.Contract` subclass by design — it is a copy-paste reference, not a
+deployable file. The `Makefile` and CI workflow were updated to route it through
+`lint` instead of `check` rather than skip it entirely.
+
+All three examples (`read_only.py`, `request_then_settle.py`, `refresh_on_stale.py`)
+lint, validate, and deploy standalone with the exact method counts designed. 3 new
+direct-mode tests confirm each one deploys and its constructor wires up storage
+correctly — 22 direct-mode tests pass in total across the whole suite.
+
+**Task 4.2 (key parity) was substantively completed in phase 3** — five golden
+vectors verified equal between `compute_key` (on-chain) and `veritas_key` (off-chain)
+in `tests/direct/test_veritas_parity.py`.
+
+**The phase-4 gate — "the reuse test" — needed honest redefinition, not
+reinterpretation.** The original plan called for a live cross-contract read: deploy
+Veritas, deploy a consumer, have the consumer call Veritas through
+`gl.get_contract_at`. Investigated directly rather than assumed: `direct_deploy`'s
+returned contract instance exposes no address attribute, and `direct_vm` tracks only
+a single private `_contract_address` — there is no multi-contract registry in direct
+mode at all. This is architecturally consistent with the docs' own description of
+direct mode as "in-memory, no network," where Studio mode is "deploys via RPC" — a
+network of independently-addressed, cross-callable contracts is precisely what direct
+mode does not model. **What is proven now:** each example lints, validates, and
+deploys cleanly using only `interface.py`'s ~15-line block and README's copy-paste
+snippet — never opening `veritas.py`'s ~650 lines. **What remains for phase 5:** the
+actual live cross-contract call, provable only against Studio/testnet where
+`gl.get_contract_at` resolves a second real deployed address.
+
+One more real bug, found while wiring the examples' direct-mode tests: `genlayer`
+(the SDK) is not importable at Python module load time — it only becomes importable
+as a side effect of `direct_deploy()` injecting its path onto `sys.path` mid-call. A
+top-level `from genlayer.py.types import Address` in a test file fails collection
+with `ModuleNotFoundError`. A throwaway `direct_deploy()` call to force that path
+setup was tried next and also failed — `gltest`'s VM allows only **one** contract
+class per test ("only one contract is allowed"), so a warm-up deploy collides with
+the real one. Fixed by calling `gltest.direct.sdk_loader.setup_sdk_paths()` directly,
+which needs no contract and has no such restriction.
+
 ## Phase 5 — Integration and testnet
 
 | # | Task | Done when |

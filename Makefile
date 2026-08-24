@@ -5,12 +5,20 @@
 export PYTHONIOENCODING = utf-8
 export PYTHONUTF8 = 1
 
-CONTRACTS := $(shell find contracts -name '*.py' 2>/dev/null)
+# interface.py is never deployed (no gl.Contract subclass) — it's a
+# copy-paste reference block, so it fails `check`'s deployability
+# validation by design. AST-lint it with `lint` instead.
+INTERFACE_ONLY := $(shell find contracts -name 'interface.py' 2>/dev/null)
+CONTRACTS := $(filter-out $(INTERFACE_ONLY), $(shell find contracts -name '*.py' 2>/dev/null))
 
 lint:
 	@for f in $(CONTRACTS); do \
 		echo "== $$f =="; \
 		genvm-lint check $$f || exit 1; \
+	done
+	@for f in $(INTERFACE_ONLY); do \
+		echo "== $$f (AST-only, not deployable) =="; \
+		genvm-lint lint $$f || exit 1; \
 	done
 
 lint-file:
