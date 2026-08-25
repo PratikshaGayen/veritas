@@ -541,7 +541,33 @@ Ethereum mainnet, which a freshly-generated dev account does not have. User is
 funding directly; deploy commands are ready to run the moment it lands. Balance
 checked as of this commit: still 0 GEN on Testnet Bradbury.
 
-## Phase 6 — Adapter rewrites
+**Phase 6 reframed and complete, 2026-08-24.** The original plan — literally rewrite
+Sybilon's and SignalJudge's fetch-and-ask blocks to call Veritas — did not survive
+contact with the real code. Both `Sybilon/contract/eligibility_judge.py` and
+`signaljudge-ui/contract/signal_judge.py` (real, deployed contracts, read in full)
+fetch **structured JSON APIs** (GitHub REST, Binance klines) and only ever let the
+LLM judge pre-extracted, deterministic facts — never raw unstructured content.
+That is precisely the case Veritas does *not* target, and forcing a retrofit would
+have misrepresented what Veritas solves.
+
+Reframed per user decision: rather than a literal dependency swap, phase 6 became
+a **case study** — [docs/ADAPTER-LESSONS.md](./ADAPTER-LESSONS.md) — documenting two
+real gaps found by reading the actual code: Sybilon's `judge()` hard-reverts the
+whole transaction (losing already-fetched on-chain data) on a GitHub `429`, treating
+a transient rate-limit as a deterministic client error; SignalJudge's Binance klines
+parser has no guard around `json.loads()`, so a malformed/rate-limited response
+raises an unclassified Python exception rather than the contract's own established
+error taxonomy. Both proposed fixes reuse sentinel patterns each contract's author
+already established elsewhere in the same file — extending an existing idiom, not
+importing Veritas's vocabulary into a foreign codebase.
+
+**Deliberately not done:** the proposed patches were **not applied** to either
+external repository. SignalJudge escrows real staked GEN; a change to its
+error-handling path needs deliberate review and a redeployment decision separate
+from this session's Veritas work. The case study is reviewable and the patches are
+concrete, but applying them is a distinct, explicit action for later.
+
+## Phase 6 — Adapter rewrites (superseded — see reframing note above)
 
 | # | Task | Done when |
 |---|---|---|

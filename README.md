@@ -148,6 +148,7 @@ callers with different freshness needs still share one cache slot.
 | [SUBMISSION-STRATEGY.md](docs/SUBMISSION-STRATEGY.md) | How this maps to GenLayer Points contribution categories |
 | [RUNNER.md](docs/RUNNER.md) | Pinned runner hash, direct-mode test setup (the WSL cache workaround) |
 | [FRICTION.md](docs/FRICTION.md) | Real GenLayer tooling/docs bugs found while building this, with repros |
+| [ADAPTER-LESSONS.md](docs/ADAPTER-LESSONS.md) | Why a literal Veritas retrofit didn't fit two real external contracts, and what did |
 
 ---
 
